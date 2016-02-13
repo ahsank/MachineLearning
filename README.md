@@ -9,6 +9,8 @@ Install IPython:
     sudo apt-get install build-essential python-dev python-numpy \
     python-numpy-dev python-scipy libatlas-dev g++ python-matplotlib \
     ipython
+    
+    sudo apt-get install ipython-notebook python-matplotlib
 
 Run the notebook:
 
