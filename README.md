@@ -25,8 +25,11 @@ Browse following URL on remote machine:
 
     http://locahost:6025
 
-Add following to show graphs:
+Add following in the notebook to show graphs inline:
 
     %matplotlib inline
     
-    
+Add followings command to show graphs inline without scrollbar:
+
+    %%javascript
+    IPython.OutputArea.auto_scroll_threshold = 9999;
