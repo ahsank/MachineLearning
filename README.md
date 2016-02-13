@@ -11,6 +11,10 @@ Install IPython:
     ipython
     
     sudo apt-get install ipython-notebook python-matplotlib
+    
+    sudo apt-get install python-pip
+    
+    pip install -U scikit-learn
 
 Run the notebook:
 
