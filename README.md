@@ -33,3 +33,7 @@ Add followings command to show graphs inline without scrollbar:
 
     %%javascript
     IPython.OutputArea.auto_scroll_threshold = 9999;
+
+Convert notebook to html by:
+
+    $ ipython nbconvert --to FORMAT notebook.ipynb
