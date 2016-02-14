@@ -21,6 +21,7 @@ Install IPython:
     sudo apt-get install python-pydot
     # For converting the notebook to html
     sudo apt-get install python-pygments
+    sudo apt-get install pandoc
 
 Run the notebook:
 
