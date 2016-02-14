@@ -19,6 +19,15 @@ Install IPython:
 Run the notebook:
 
     cd <notebook folder>
+    
+To run locally:
+
+    ipython notebook <optional notebook file>
+    
+It will open the notebook in a browser.
+
+To access the notebook from a remote machine browser. First `ssh` to the notebook computer and run command:
+
     ipython notebook --no-browser --port=7000
     
 To access Notebook from a remote machine:
