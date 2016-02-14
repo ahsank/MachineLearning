@@ -30,9 +30,9 @@ To access the notebook from a remote machine browser. First `ssh` to the noteboo
 
     ipython notebook --no-browser --port=7000
     
-To access Notebook from a remote machine:
+On the machine you are accessing the notebook from. Run: 
 
-    ssh -N -f -L localhost:6025:localhost:7000 username@<ip of notebook pc>
+    ssh -N -f -L localhost:6025:localhost:7000 username@<ip of machine running notebook>
     
 Browse following URL on remote machine:
 
