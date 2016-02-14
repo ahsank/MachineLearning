@@ -17,7 +17,10 @@ Install IPython:
     pip install -U scikit-learn
     
     # Optional modules
+    # To draw graphviz inine.
     sudo apt-get install python-pydot
+    # For converting the notebook to html
+    sudo apt-get install python-pygments
 
 Run the notebook:
 
