@@ -15,6 +15,9 @@ Install IPython:
     sudo apt-get install python-pip
     
     pip install -U scikit-learn
+    
+    # Optional modules
+    sudo apt-get install python-pydot
 
 Run the notebook:
 
