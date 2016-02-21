@@ -8399,9 +8399,10 @@ Std price : 9.18801154528
 <p>Q. What happens if you do not do this?</p>
 <p>With the increase of model complexity, the model will overfit training data. In that case the training error will be minimal but the model will fail to predict new cases.</p>
 <p>Q. What does grid search do and why might you want to use it?</p>
-<p>Grid search trains the model with different parameters and chooses a parameter that minimizes testing set error.</p>
+<p>Grid search is used to find the best parameters among a set of parameters. To do this 1) a sample of parameters are choosen from the parameter range 2) The known examples data is divided into training and test set. 2) The model is trained on the training set for each value of the parameter 4) The trained model is evaluated using the test set. 5) Then it chooses the parameter that minimizes evaluation error on the test set.</p>
 <p>Q. Why is cross validation useful and why might we use it with grid search.</p>
-<p>Cross validation uses different set of samples than training samples so not prone to overfitting. Grid search chooses parameter that minimizes cross validation/testing error.</p>
+<p>The goal of cross validation is to get an indication of how well the model will predict indipendent data set. For this purpose the data is divided into training and test cases instead of using all the data for training. The model is trained using the training data set and evaluated using the test set. This minimizes the chance of overfitting the training data although at the expense of having less data available for training.</p>
+<p>Cross validating is used in the grid search to choose a training parameter. Grid search chooses the parameter that minimizes error on test data. This makes sure parameter that overfits the training data for example by just memorizing the data are not choosen.</p>
 <h1 id="analyzing-model-performance">Analyzing Model Performance</h1>
 <p>Q. Look at all learning curve graphs provided. What is the general trend of training and testing error as training size increases?</p>
 <p>Training error increases but testing error decreases.</p>
@@ -8412,7 +8413,7 @@ Std price : 9.18801154528
 <p>Based on this relationship, which model (max depth) best generalizes the dataset and why?</p>
 <p>Decision tree with max depth 4 to 6 depending on random run best generalizes the dataset. This value is printed above in output of Grid search <code>best_params_</code> output. It is apparent from graph that test error increases slightly after model depth 6</p>
 <p>Q. Compare prediction to earlier statistics and make a case if you think it is a valid model.</p>
-<p>It is hard to plot data to verify the prediction because the dimension of the data is more than 2. The output above prints value of the nearest house feature of the test vector and compares their price. The prediction is 21.6 but the price of closest feature value is 27.9, so the prediction error is 22% which makes it not an accurate model. Also from the error graph best test error is about 3, where mean price is 22 so the overall error is more than 10%, so the model is not very accurate.</p>
+<p>To verify the general prediction quality of the model, the standard deviation of the price is 9. As the standard deviation is square root of variance, standard deviation intuitively is the error if we just had chosen average price as the model prediction for all data. From the graph of th the model error we see the average model prediction error is between 2 and 3. So the model gives significant better prediction than just using average price as prediction. However the error of say 2.5 is more than 10% error for an average data whose value is 22.5. So we can say the prediction of the model in general will have more than 10% error.</p>
 </div>
 <div class="cell border-box-sizing code_cell vbox">
 <div class="input hbox">
