@@ -1,0 +1,41 @@
+site_name: ML Notes
+site_description: Notes and summaries from machine learning papers I study
+docs_dir: notes
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    scheme: default
+    primary: indigo
+    accent: blue
+
+nav:
+  - Home: index.md
+  - Papers:
+    - Overview: papers/index.md
+    - "Example: Attention Is All You Need": papers/example-attention-is-all-you-need.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - admonition
+  - tables
+  - footnotes
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.details
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

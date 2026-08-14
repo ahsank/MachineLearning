@@ -1,59 +1,42 @@
-# Machine Learning
+# ML Notes
 
-## Installation Instruction
+Notes and summaries written while studying machine learning papers,
+published as a static site with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/).
 
-### IPython Notebook
+Published site: https://ahsank.github.io/MachineLearning/
 
-Install IPython:
+## Writing a new note
 
-    sudo apt-get install build-essential python-dev python-numpy \
-    python-numpy-dev python-scipy libatlas-dev g++ python-matplotlib \
-    ipython
-    
-    sudo apt-get install ipython-notebook python-matplotlib
-    
-    sudo apt-get install python-pip
-    
-    pip install -U scikit-learn
-    
-    # Optional modules
-    # To draw graphviz inine.
-    sudo apt-get install python-pydot
-    # For converting the notebook to html
-    sudo apt-get install python-pygments
-    sudo apt-get install pandoc
+Notes live under [`notes/papers/`](notes/papers/), one Markdown file per
+paper. [`notes/papers/example-attention-is-all-you-need.md`](notes/papers/example-attention-is-all-you-need.md)
+is a template showing the format (summary, math via `$...$`/`$$...$$`,
+admonitions, code blocks).
 
-Run the notebook:
+1. Copy the example file and rename it for your paper, e.g.
+   `notes/papers/resnet.md`.
+2. Add it to the `nav` section of [`mkdocs.yml`](mkdocs.yml) and to
+   [`notes/papers/index.md`](notes/papers/index.md).
+3. Preview locally (see below) and check formatting.
+4. Commit and push to `master` — GitHub Actions builds the site and
+   publishes it to GitHub Pages automatically.
 
-    cd <notebook folder>
-    
-To run locally:
+## Local preview
 
-    ipython notebook <optional notebook file>
-    
-It will open the notebook in a browser.
+A conda environment named `mkdocs` with `mkdocs-material` installed is set
+up for this:
 
-To access the notebook from a remote machine browser. First `ssh` to the notebook computer and run command:
+    conda activate mkdocs
+    mkdocs serve
 
-    ipython notebook --no-browser --port=7000
-    
-On the machine you are accessing the notebook from. Run: 
+Then open <http://127.0.0.1:8000> and edit files under `notes/` — the
+preview reloads on save.
 
-    ssh -N -f -L localhost:6025:localhost:7000 username@<ip of machine running notebook>
-    
-Browse following URL on remote machine:
+If you don't have that environment, create it with:
 
-    http://locahost:6025
+    conda create -n mkdocs -c conda-forge mkdocs-material
 
-When running the notebook from remote machine, add following in the notebook to show graphs inline:
+## Older content
 
-    %matplotlib inline
-    
-Add followings command to show graphs inline without scrollbar:
-
-    %%javascript
-    IPython.OutputArea.auto_scroll_threshold = 9999;
-
-After editing notebook is done, convert notebook to html by:
-
-    $ ipython nbconvert --to FORMAT notebook.ipynb
+[`udacity/`](udacity/) holds coursework (a Jupyter notebook on the Boston
+housing dataset) predating this repo's use for paper notes. It isn't part
+of the published site.
