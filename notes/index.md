@@ -8,14 +8,17 @@ math or code made it click for me.
 
 - **[Papers](papers/index.md)** — one page per paper, named
   `papers/<short-title>.md`.
+- **[Concepts](concepts/index.md)** — one page per general ML/math
+  concept that spans multiple papers, named `concepts/<short-title>.md`.
 
 See [`papers/example-attention-is-all-you-need.md`](papers/example-attention-is-all-you-need.md)
-for the format a new note follows.
+for the format a new paper note follows.
 
 ## Writing a new note
 
-1. Copy the example page under `notes/papers/` and rename it to match the
-   paper (e.g. `notes/papers/resnet.md`).
+1. Copy the example page under `notes/papers/` (or an existing page under
+   `notes/concepts/`) and rename it to match the topic (e.g.
+   `notes/papers/resnet.md` or `notes/concepts/backpropagation.md`).
 2. Add it to the `nav` section of `mkdocs.yml`.
 3. Preview locally:
 

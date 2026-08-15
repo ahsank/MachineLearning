@@ -9,8 +9,9 @@ A personal MkDocs Material site of notes/summaries written while studying machin
 ## Site structure and gotchas
 
 - `mkdocs.yml` sets `docs_dir: notes` — this is **not** the MkDocs default `docs/`. New content goes under `notes/`.
-- Adding a new paper note requires updating **two** places or it won't appear on the site: the `nav` section in `mkdocs.yml` and `notes/papers/index.md`.
-- New paper notes should mirror the structure of `notes/papers/example-attention-is-all-you-need.md` (TL;DR, Problem, Key idea, Architecture, etc., with `!!! info` admonitions and `$...$`/`$$...$$` math via MathJax).
+- Two kinds of notes live side by side: `notes/papers/` (one paper per note) and `notes/concepts/` (general ML/math concepts spanning multiple papers, e.g. SVD, backprop).
+- Adding a new note requires updating **two** places or it won't appear on the site: the `nav` section in `mkdocs.yml` and the relevant `index.md` (`notes/papers/index.md` or `notes/concepts/index.md`).
+- New paper notes should mirror the structure of `notes/papers/example-attention-is-all-you-need.md` (TL;DR, Problem, Key idea, Architecture, etc., with `!!! info` admonitions and `$...$`/`$$...$$` math via MathJax). Concept notes follow a looser structure (see `notes/concepts/singular-value-decomposition.md`) but use the same admonition/math conventions.
 
 ## Local preview and deploy
 

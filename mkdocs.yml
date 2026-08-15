@@ -20,6 +20,9 @@ nav:
   - Papers:
     - Overview: papers/index.md
     - "Example: Attention Is All You Need": papers/example-attention-is-all-you-need.md
+  - Concepts:
+    - Overview: concepts/index.md
+    - Singular Value Decomposition (SVD): concepts/singular-value-decomposition.md
 
 plugins:
   - search

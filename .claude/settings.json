@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(jq -r '.tool_input.file_path // .tool_response.filePath'); case \"$f\" in */notes/papers/index.md) ;; */notes/papers/*.md) echo '{\"systemMessage\": \"Reminder: wire this note into mkdocs.yml nav and notes/papers/index.md.\"}' ;; esac"
+            "command": "f=$(jq -r '.tool_input.file_path // .tool_response.filePath'); case \"$f\" in */notes/papers/index.md|*/notes/concepts/index.md) ;; */notes/papers/*.md) echo '{\"systemMessage\": \"Reminder: wire this note into mkdocs.yml nav and notes/papers/index.md.\"}' ;; */notes/concepts/*.md) echo '{\"systemMessage\": \"Reminder: wire this note into mkdocs.yml nav and notes/concepts/index.md.\"}' ;; esac"
           }
         ]
       }
