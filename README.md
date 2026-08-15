@@ -3,7 +3,7 @@
 Notes and summaries written while studying machine learning papers,
 published as a static site with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/).
 
-Published site: https://ahsank.github.io/MachineLearning/
+Published site: <https://ahsank.github.io/MachineLearning/>
 
 ## Writing a new note
 

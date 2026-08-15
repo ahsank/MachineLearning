@@ -1,0 +1,10 @@
+{
+  "name": "machinelearning-notes",
+  "private": true,
+  "scripts": {
+    "lint:md": "markdownlint-cli2 \"notes/**/*.md\" \"*.md\""
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "^0.23.2"
+  }
+}
