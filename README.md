@@ -35,6 +35,13 @@ If you don't have that environment, create it with:
 
     conda create -n mkdocs -c conda-forge mkdocs-material
 
+## Code
+
+[`code/`](code/) holds standalone Python scripts used to experiment with
+concepts covered in the notes (e.g. building word vectors via SVD). Each
+script is self-contained; see [`code/README.md`](code/README.md) for how
+to set one up and run it.
+
 ## Older content
 
 [`udacity/`](udacity/) holds coursework (a Jupyter notebook on the Boston

@@ -12,6 +12,7 @@ A personal MkDocs Material site of notes/summaries written while studying machin
 - Two kinds of notes live side by side: `notes/papers/` (one paper per note) and `notes/concepts/` (general ML/math concepts spanning multiple papers, e.g. SVD, backprop).
 - Adding a new note requires updating **two** places or it won't appear on the site: the `nav` section in `mkdocs.yml` and the relevant `index.md` (`notes/papers/index.md` or `notes/concepts/index.md`).
 - New paper notes should mirror the structure of `notes/papers/example-attention-is-all-you-need.md` (TL;DR, Problem, Key idea, Architecture, etc., with `!!! info` admonitions and `$...$`/`$$...$$` math via MathJax). Concept notes follow a looser structure (see `notes/concepts/singular-value-decomposition.md`) but use the same admonition/math conventions.
+- `code/` holds standalone Python scripts (one file per experiment, hardcoded inputs, no shared modules between scripts) that accompany notes — not part of the MkDocs site, run via a venv per `code/README.md`. When a note links to one, link the GitHub-hosted file (`https://github.com/ahsank/MachineLearning/blob/master/code/...`), since `code/` isn't under `docs_dir`.
 
 ## Local preview and deploy
 
