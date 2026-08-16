@@ -23,6 +23,7 @@ nav:
   - Concepts:
     - Overview: concepts/index.md
     - Singular Value Decomposition (SVD): concepts/singular-value-decomposition.md
+  - Writing a New Note: contributing.md
 
 plugins:
   - search
