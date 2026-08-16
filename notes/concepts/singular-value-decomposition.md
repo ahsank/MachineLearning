@@ -122,7 +122,7 @@ similar rows in $M$ — i.e. similar co-occurrence patterns — land close
 together in this reduced space, even if they never co-occur with each
 other.
 
-### Worked example
+### Worked example: word vectors
 
 [`code/svd_word_vectors.py`](https://github.com/ahsank/MachineLearning/blob/master/code/svd_word_vectors.py)
 hardcodes five short documents split across two loose topics (beverages,
@@ -160,3 +160,83 @@ best-connected ("hub") words in that block — the same reasoning puts
 `rain` and `snow` furthest out on the weather axis. See
 [`code/README.md`](https://github.com/ahsank/MachineLearning/blob/master/code/README.md)
 for how to run the script yourself.
+
+## Example: recommender systems via SVD (matrix factorization)
+
+The same low-rank idea works on a **user-item rating matrix** instead of
+a word-word one, which is the classic "latent factor" collaborative
+filtering technique behind things like the Netflix Prize models.
+
+### Setup
+
+Let $R \in \mathbb{R}^{m \times n}$ hold ratings for $m$ users and $n$
+items, where most entries are missing (a user has only rated a handful of
+items). Unlike the co-occurrence matrix above, $R$ isn't symmetric and is
+mostly empty, so it needs two adjustments before a plain SVD applies:
+
+1. **Fill the missing entries** with something neutral — commonly each
+   user's mean rating — so $R$ becomes dense.
+2. **Mean-center** by subtracting those user means, so the fill-in value
+   doesn't itself distort the factorization.
+
+### From ratings to recommendations
+
+Truncating the SVD of the centered, filled matrix to $k$ factors,
+
+$$
+\hat{R} = U_k \Sigma_k V_k^\top + \bar{r}
+$$
+
+gives $U_k \Sigma_k \in \mathbb{R}^{m \times k}$ as user vectors and
+$V_k \in \mathbb{R}^{n \times k}$ as item vectors in a shared $k$-dimensional
+"taste space" ($\bar{r}$ is the per-user mean added back). Because $\hat R$
+is a *low-rank* approximation of $R$, it doesn't just reproduce the
+ratings it was given — it fills in the missing entries with values
+consistent with the dominant taste patterns, i.e. it predicts how a user
+would likely rate something they haven't tried. Recommending an item is
+then just ranking a user's unrated columns by predicted value.
+
+### Worked example: song recommendations
+
+[`code/svd_recommender.py`](https://github.com/ahsank/MachineLearning/blob/master/code/svd_recommender.py)
+hardcodes an 8-user × 6-song rating matrix (1-5, 0 = unrated) split
+between "rock" and "pop" listeners, with several ratings left out on
+purpose:
+
+```python
+def predict_ratings(ratings, k):
+    observed = ratings > 0
+    user_means = np.array([
+        ratings[u, observed[u]].mean() if observed[u].any() else 0.0
+        for u in range(ratings.shape[0])
+    ])
+
+    filled = np.where(observed, ratings, user_means[:, None])
+    centered = filled - user_means[:, None]
+
+    u, s, vt = np.linalg.svd(centered, full_matrices=False)
+    reconstructed = u[:, :k] @ np.diag(s[:k]) @ vt[:k, :]
+    return np.clip(reconstructed + user_means[:, None], 1.0, 5.0)
+```
+
+Reconstructing with $k=2$ factors fills in every blank with a rating
+consistent with the user's genre:
+
+![Two heatmaps of an 8-user by 6-song rating matrix: observed ratings with several blank cells on the left, and the SVD-reconstructed predicted ratings filling in every cell on the right](images/svd-recommender.png)
+
+For instance `u3` never rated `rock_c`, but since `u3` rated every other
+rock song 5, SVD predicts `rock_c` at 4.4 — high enough to surface as a
+recommendation — while `u3`'s predicted pop ratings stay low. The script
+also hides one *known* rating and checks the prediction against the true
+value as a quick sanity check of the whole approach.
+
+!!! info "Why not just use `numpy.linalg.svd` on sparse ratings directly?"
+    Real rating matrices are far too sparse (and far too big) to fill in
+    and factor with a dense SVD like this toy example does. Production
+    systems instead learn the same $U_k$, $V_k$ factors by gradient
+    descent directly against the *observed* entries only (skipping
+    missing ones entirely) — the technique popularized by the Netflix
+    Prize and implemented by libraries like
+    [Surprise](https://surpriselib.com/). `sklearn.decomposition.TruncatedSVD`
+    is a useful middle ground for larger-but-still-dense matrices, since
+    it avoids computing the singular vectors you're about to discard.

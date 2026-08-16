@@ -42,4 +42,8 @@ folder — delete those files too if you don't want to keep them around.
   co-occurrence matrix from a handful of hardcoded example documents,
   factors it with SVD, and plots the resulting word vectors in 2D.
   Accompanies
-  [Singular Value Decomposition — Example](../notes/concepts/singular-value-decomposition.md#example-word-vectors-from-a-co-occurrence-matrix).
+  [Singular Value Decomposition — Example: word vectors](../notes/concepts/singular-value-decomposition.md#example-word-vectors-from-a-co-occurrence-matrix).
+- [`svd_recommender.py`](svd_recommender.py) — factors a small hardcoded
+  user-song rating matrix with SVD to predict missing ratings and
+  recommend unrated songs. Accompanies
+  [Singular Value Decomposition — Example: recommender systems](../notes/concepts/singular-value-decomposition.md#example-recommender-systems-via-svd-matrix-factorization).
