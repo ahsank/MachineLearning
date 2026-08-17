@@ -62,3 +62,15 @@ folder — delete those files too if you don't want to keep them around.
   svd_page_matrix_multi_stock_forecast.py AAPL MSFT GOOG --period 2y`.
   Also supports `--backtest-days`. Accompanies
   [Multivariate Singular Spectrum Analysis — multiple stocks](../notes/papers/mssa-page-matrix-svd.md#worked-example-multiple-stocks).
+- [`svd_denoised_ar_stock_forecast.py`](svd_denoised_ar_stock_forecast.py) —
+  simplified variant of the single-stock script: denoise with SVD, then
+  fit a plain autoregression on *overlapping* windows of the denoised
+  series (instead of the paper's one-example-per-page regression). Same
+  CLI as `svd_page_matrix_stock_forecast.py`, plus `--window` to set the
+  AR lag count independently of the denoising length. Accompanies
+  [SVD-Denoised Autoregressive Forecasting](../notes/concepts/svd-denoised-autoregressive-forecasting.md).
+- [`svd_denoised_ar_multi_stock_forecast.py`](svd_denoised_ar_multi_stock_forecast.py) —
+  same variant across several stocks, pooling overlapping windows from
+  every stock's denoised series into one shared regression. Same CLI as
+  `svd_page_matrix_multi_stock_forecast.py`. Accompanies
+  [SVD-Denoised Autoregressive Forecasting](../notes/concepts/svd-denoised-autoregressive-forecasting.md).

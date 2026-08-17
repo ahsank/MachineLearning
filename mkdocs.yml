@@ -24,6 +24,7 @@ nav:
   - Concepts:
     - Overview: concepts/index.md
     - Singular Value Decomposition (SVD): concepts/singular-value-decomposition.md
+    - SVD-Denoised Autoregressive Forecasting: concepts/svd-denoised-autoregressive-forecasting.md
   - Writing a New Note: contributing.md
 
 plugins:
