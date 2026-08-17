@@ -1,0 +1,1214 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Notes and summaries from machine learning papers I study">
+      
+      
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../svd-denoised-autoregressive-forecasting/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Singular Value Decomposition (SVD) - ML Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#singular-value-decomposition-svd" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="ML Notes" class="md-header__button md-logo" aria-label="ML Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ML Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Singular Value Decomposition (SVD)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ML Notes" class="md-nav__button md-logo" aria-label="ML Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ML Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../papers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Papers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Papers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../papers/example-attention-is-all-you-need/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Example: Attention Is All You Need
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../papers/mssa-page-matrix-svd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multivariate Singular Spectrum Analysis (Page Matrix SVD)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Singular Value Decomposition (SVD)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Singular Value Decomposition (SVD)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-u-v-come-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where U, V, Σ come from
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#geometric-picture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Geometric picture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#low-rank-approximation-eckartyoung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Low-rank approximation (Eckart–Young)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relation-to-pca" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relation to PCA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pseudo-inverse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pseudo-inverse
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-word-vectors-from-a-co-occurrence-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: word vectors from a co-occurrence matrix
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example: word vectors from a co-occurrence matrix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#building-the-co-occurrence-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building the co-occurrence matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-counts-to-vectors-truncated-svd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From counts to vectors: truncated SVD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#worked-example-word-vectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked example: word vectors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-recommender-systems-via-svd-matrix-factorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: recommender systems via SVD (matrix factorization)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example: recommender systems via SVD (matrix factorization)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-ratings-to-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From ratings to recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#worked-example-song-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked example: song recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../svd-denoised-autoregressive-forecasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SVD-Denoised Autoregressive Forecasting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a New Note
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-u-v-come-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where U, V, Σ come from
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#geometric-picture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Geometric picture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#low-rank-approximation-eckartyoung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Low-rank approximation (Eckart–Young)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relation-to-pca" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relation to PCA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pseudo-inverse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pseudo-inverse
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-word-vectors-from-a-co-occurrence-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: word vectors from a co-occurrence matrix
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example: word vectors from a co-occurrence matrix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#building-the-co-occurrence-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building the co-occurrence matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-counts-to-vectors-truncated-svd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From counts to vectors: truncated SVD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#worked-example-word-vectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked example: word vectors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-recommender-systems-via-svd-matrix-factorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: recommender systems via SVD (matrix factorization)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example: recommender systems via SVD (matrix factorization)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-ratings-to-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From ratings to recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#worked-example-song-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked example: song recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="singular-value-decomposition-svd">Singular Value Decomposition (SVD)<a class="headerlink" href="#singular-value-decomposition-svd" title="Permanent link">&para;</a></h1>
+<div class="admonition info">
+<p class="admonition-title">Where this shows up</p>
+<p>PCA, low-rank matrix approximation, pseudo-inverses / least squares,
+recommender systems (matrix factorization), and as the numerical
+backbone under a lot of "compress this big matrix" tricks in ML papers.</p>
+</div>
+<h2 id="definition">Definition<a class="headerlink" href="#definition" title="Permanent link">&para;</a></h2>
+<p>Any real matrix <span class="arithmatex">\(A \in \mathbb{R}^{m \times n}\)</span> can be factored as</p>
+<div class="arithmatex">\[
+A = U \Sigma V^\top
+\]</div>
+<ul>
+<li><span class="arithmatex">\(U \in \mathbb{R}^{m \times m}\)</span> and <span class="arithmatex">\(V \in \mathbb{R}^{n \times n}\)</span> are
+  orthogonal (<span class="arithmatex">\(U^\top U = I\)</span>, <span class="arithmatex">\(V^\top V = I\)</span>).</li>
+<li><span class="arithmatex">\(\Sigma \in \mathbb{R}^{m \times n}\)</span> is diagonal (in the rectangular
+  sense — zero off the main diagonal) with non-negative entries
+  <span class="arithmatex">\(\sigma_1 \geq \sigma_2 \geq \dots \geq \sigma_r \geq 0\)</span>, the <strong>singular
+  values</strong>, where <span class="arithmatex">\(r = \mathrm{rank}(A)\)</span>.</li>
+</ul>
+<p>Columns of <span class="arithmatex">\(U\)</span> are the <strong>left singular vectors</strong>, columns of <span class="arithmatex">\(V\)</span> the
+<strong>right singular vectors</strong>.</p>
+<h2 id="where-u-v-come-from">Where U, V, Σ come from<a class="headerlink" href="#where-u-v-come-from" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The columns of <span class="arithmatex">\(V\)</span> are eigenvectors of <span class="arithmatex">\(A^\top A\)</span>; the columns of <span class="arithmatex">\(U\)</span>
+  are eigenvectors of <span class="arithmatex">\(A A^\top\)</span>.</li>
+<li>The singular values are the square roots of the (shared, non-negative)
+  eigenvalues of <span class="arithmatex">\(A^\top A\)</span> and <span class="arithmatex">\(A A^\top\)</span>: <span class="arithmatex">\(\sigma_i = \sqrt{\lambda_i}\)</span>.</li>
+<li>So SVD generalizes eigendecomposition to non-square, non-symmetric
+  matrices — every matrix has an SVD, but not every matrix has an
+  eigendecomposition.</li>
+</ul>
+<h2 id="geometric-picture">Geometric picture<a class="headerlink" href="#geometric-picture" title="Permanent link">&para;</a></h2>
+<p><span class="arithmatex">\(A\)</span> maps the unit sphere in <span class="arithmatex">\(\mathbb{R}^n\)</span> to an ellipsoid in
+<span class="arithmatex">\(\mathbb{R}^m\)</span>: <span class="arithmatex">\(V^\top\)</span> rotates the input, <span class="arithmatex">\(\Sigma\)</span> stretches each axis
+by <span class="arithmatex">\(\sigma_i\)</span>, and <span class="arithmatex">\(U\)</span> rotates the result into place. The <span class="arithmatex">\(\sigma_i\)</span> are
+literally the lengths of the ellipsoid's semi-axes.</p>
+<h2 id="low-rank-approximation-eckartyoung">Low-rank approximation (Eckart–Young)<a class="headerlink" href="#low-rank-approximation-eckartyoung" title="Permanent link">&para;</a></h2>
+<p>Writing <span class="arithmatex">\(A = \sum_{i=1}^r \sigma_i u_i v_i^\top\)</span> (sum of rank-1 terms,
+largest <span class="arithmatex">\(\sigma_i\)</span> first), the best rank-<span class="arithmatex">\(k\)</span> approximation of <span class="arithmatex">\(A\)</span> in both
+Frobenius and spectral norm is just truncating the sum:</p>
+<div class="arithmatex">\[
+A_k = \sum_{i=1}^k \sigma_i u_i v_i^\top
+\]</div>
+<p>This is the "why" behind SVD-based compression: keep the top-<span class="arithmatex">\(k\)</span> singular
+triples, drop the rest, and you have the closest possible rank-<span class="arithmatex">\(k\)</span>
+matrix — with error <span class="arithmatex">\(\|A - A_k\|_F = \sqrt{\sum_{i=k+1}^r \sigma_i^2}\)</span>.</p>
+<h2 id="relation-to-pca">Relation to PCA<a class="headerlink" href="#relation-to-pca" title="Permanent link">&para;</a></h2>
+<p>For a centered data matrix <span class="arithmatex">\(X\)</span> (rows = samples, columns = features), PCA's
+principal components are exactly the right singular vectors <span class="arithmatex">\(V\)</span> of <span class="arithmatex">\(X\)</span>,
+and the projected scores are <span class="arithmatex">\(U \Sigma\)</span>. In practice, SVD on <span class="arithmatex">\(X\)</span> directly
+is more numerically stable than eigendecomposing the covariance matrix
+<span class="arithmatex">\(X^\top X\)</span>.</p>
+<h2 id="pseudo-inverse">Pseudo-inverse<a class="headerlink" href="#pseudo-inverse" title="Permanent link">&para;</a></h2>
+<p>The Moore-Penrose pseudo-inverse falls out directly:</p>
+<div class="arithmatex">\[
+A^+ = V \Sigma^+ U^\top
+\]</div>
+<p>where <span class="arithmatex">\(\Sigma^+\)</span> inverts the non-zero singular values in place and
+transposes the shape. This gives the least-squares solution to
+<span class="arithmatex">\(Ax = b\)</span> even when <span class="arithmatex">\(A\)</span> isn't square or invertible.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">k</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">A_k</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">]</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">[:</span><span class="n">k</span><span class="p">])</span> <span class="o">@</span> <span class="n">Vt</span><span class="p">[:</span><span class="n">k</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># best rank-k approximation</span>
+</code></pre></div>
+<h2 id="example-word-vectors-from-a-co-occurrence-matrix">Example: word vectors from a co-occurrence matrix<a class="headerlink" href="#example-word-vectors-from-a-co-occurrence-matrix" title="Permanent link">&para;</a></h2>
+<p>A classic "count-based" way to turn words into vectors: count how often
+words appear near each other across a corpus, then run SVD on the
+resulting matrix and keep the top singular directions as word vectors.
+Related words end up with similar vectors because they tend to appear in
+similar contexts, not because they ever appear next to each other
+directly.</p>
+<h3 id="building-the-co-occurrence-matrix">Building the co-occurrence matrix<a class="headerlink" href="#building-the-co-occurrence-matrix" title="Permanent link">&para;</a></h3>
+<p>Fix a vocabulary of <span class="arithmatex">\(n\)</span> words and a window size <span class="arithmatex">\(w\)</span>. For each occurrence
+of word <span class="arithmatex">\(i\)</span> in the corpus, count every other word <span class="arithmatex">\(j\)</span> that falls within
+<span class="arithmatex">\(w\)</span> tokens of it and increment <span class="arithmatex">\(M_{ij}\)</span>. This gives a symmetric
+<span class="arithmatex">\(n \times n\)</span> matrix <span class="arithmatex">\(M\)</span> where <span class="arithmatex">\(M_{ij}\)</span> is roughly "how often <span class="arithmatex">\(i\)</span> and <span class="arithmatex">\(j\)</span>
+occur near each other" — a much denser, cheaper-to-build signal than
+raw text, but one that already captures a lot of distributional
+structure ("you shall know a word by the company it keeps").</p>
+<h3 id="from-counts-to-vectors-truncated-svd">From counts to vectors: truncated SVD<a class="headerlink" href="#from-counts-to-vectors-truncated-svd" title="Permanent link">&para;</a></h3>
+<p><span class="arithmatex">\(M\)</span> is symmetric, so its SVD coincides with its eigendecomposition:
+<span class="arithmatex">\(M = U \Sigma U^\top\)</span>. Row <span class="arithmatex">\(i\)</span> of <span class="arithmatex">\(M\)</span> is the count vector for word <span class="arithmatex">\(i\)</span>
+over the full vocabulary — sparse, high-dimensional, and mostly noise.
+Taking the truncated SVD</p>
+<div class="arithmatex">\[
+M \approx U_k \Sigma_k U_k^\top, \qquad
+\text{word vector for } i = (U_k \Sigma_k)_{i,:} \in \mathbb{R}^k
+\]</div>
+<p>keeps only the <span class="arithmatex">\(k\)</span> directions of <span class="arithmatex">\(M\)</span> that explain the most co-occurrence
+variance (same low-rank approximation idea as above), and rows of
+<span class="arithmatex">\(U_k \Sigma_k\)</span> become dense <span class="arithmatex">\(k\)</span>-dimensional word vectors. Words with
+similar rows in <span class="arithmatex">\(M\)</span> — i.e. similar co-occurrence patterns — land close
+together in this reduced space, even if they never co-occur with each
+other.</p>
+<h3 id="worked-example-word-vectors">Worked example: word vectors<a class="headerlink" href="#worked-example-word-vectors" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/ahsank/MachineLearning/blob/master/code/svd_word_vectors.py"><code>code/svd_word_vectors.py</code></a>
+hardcodes five short documents split across two loose topics (beverages,
+winter weather), builds their word-word co-occurrence matrix with a
+window of 3 tokens, and reduces it to 2D with truncated SVD (<span class="arithmatex">\(k=2\)</span>):</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_co_occurrence_matrix</span><span class="p">(</span><span class="n">tokenized_docs</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">window_size</span><span class="p">):</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="p">{</span><span class="n">word</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vocab</span><span class="p">)}</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">tokenized_docs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">center_pos</span><span class="p">,</span> <span class="n">center_word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">center_pos</span> <span class="o">-</span> <span class="n">window_size</span><span class="p">)</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span> <span class="n">center_pos</span> <span class="o">+</span> <span class="n">window_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">context_pos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">context_pos</span> <span class="o">!=</span> <span class="n">center_pos</span><span class="p">:</span>
+                    <span class="n">matrix</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="n">center_word</span><span class="p">],</span> <span class="n">index</span><span class="p">[</span><span class="n">doc</span><span class="p">[</span><span class="n">context_pos</span><span class="p">]]]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">matrix</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">word_vectors_via_svd</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">u</span><span class="p">[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">s</span><span class="p">[:</span><span class="n">k</span><span class="p">]</span>  <span class="c1"># rows are k-dim word vectors</span>
+</code></pre></div>
+<p>Plotting the resulting 2D vectors shows the two topics falling cleanly
+onto separate axes, since none of the beverage words ever co-occur with
+any weather word:</p>
+<p><img alt="2D word vectors from SVD of a co-occurrence matrix, showing beverage words clustered along one axis and weather words along the other" src="../images/svd-word-vectors.png" /></p>
+<p><code>coffee</code> and <code>tea</code> sit furthest out along the beverage axis because they
+each appear in two of the three beverage documents, making them the
+best-connected ("hub") words in that block — the same reasoning puts
+<code>rain</code> and <code>snow</code> furthest out on the weather axis. See
+<a href="https://github.com/ahsank/MachineLearning/blob/master/code/README.md"><code>code/README.md</code></a>
+for how to run the script yourself.</p>
+<h2 id="example-recommender-systems-via-svd-matrix-factorization">Example: recommender systems via SVD (matrix factorization)<a class="headerlink" href="#example-recommender-systems-via-svd-matrix-factorization" title="Permanent link">&para;</a></h2>
+<p>The same low-rank idea works on a <strong>user-item rating matrix</strong> instead of
+a word-word one, which is the classic "latent factor" collaborative
+filtering technique behind things like the Netflix Prize models.</p>
+<h3 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h3>
+<p>Let <span class="arithmatex">\(R \in \mathbb{R}^{m \times n}\)</span> hold ratings for <span class="arithmatex">\(m\)</span> users and <span class="arithmatex">\(n\)</span>
+items, where most entries are missing (a user has only rated a handful of
+items). Unlike the co-occurrence matrix above, <span class="arithmatex">\(R\)</span> isn't symmetric and is
+mostly empty, so it needs two adjustments before a plain SVD applies:</p>
+<ol>
+<li><strong>Fill the missing entries</strong> with something neutral — commonly each
+   user's mean rating — so <span class="arithmatex">\(R\)</span> becomes dense.</li>
+<li><strong>Mean-center</strong> by subtracting those user means, so the fill-in value
+   doesn't itself distort the factorization.</li>
+</ol>
+<h3 id="from-ratings-to-recommendations">From ratings to recommendations<a class="headerlink" href="#from-ratings-to-recommendations" title="Permanent link">&para;</a></h3>
+<p>Truncating the SVD of the centered, filled matrix to <span class="arithmatex">\(k\)</span> factors,</p>
+<div class="arithmatex">\[
+\hat{R} = U_k \Sigma_k V_k^\top + \bar{r}
+\]</div>
+<p>gives <span class="arithmatex">\(U_k \Sigma_k \in \mathbb{R}^{m \times k}\)</span> as user vectors and
+<span class="arithmatex">\(V_k \in \mathbb{R}^{n \times k}\)</span> as item vectors in a shared <span class="arithmatex">\(k\)</span>-dimensional
+"taste space" (<span class="arithmatex">\(\bar{r}\)</span> is the per-user mean added back). Because <span class="arithmatex">\(\hat R\)</span>
+is a <em>low-rank</em> approximation of <span class="arithmatex">\(R\)</span>, it doesn't just reproduce the
+ratings it was given — it fills in the missing entries with values
+consistent with the dominant taste patterns, i.e. it predicts how a user
+would likely rate something they haven't tried. Recommending an item is
+then just ranking a user's unrated columns by predicted value.</p>
+<h3 id="worked-example-song-recommendations">Worked example: song recommendations<a class="headerlink" href="#worked-example-song-recommendations" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/ahsank/MachineLearning/blob/master/code/svd_recommender.py"><code>code/svd_recommender.py</code></a>
+hardcodes an 8-user × 6-song rating matrix (1-5, 0 = unrated) split
+between "rock" and "pop" listeners, with several ratings left out on
+purpose:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict_ratings</span><span class="p">(</span><span class="n">ratings</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">observed</span> <span class="o">=</span> <span class="n">ratings</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">user_means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="n">ratings</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">observed</span><span class="p">[</span><span class="n">u</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="k">if</span> <span class="n">observed</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ratings</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">])</span>
+
+    <span class="n">filled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">observed</span><span class="p">,</span> <span class="n">ratings</span><span class="p">,</span> <span class="n">user_means</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span>
+    <span class="n">centered</span> <span class="o">=</span> <span class="n">filled</span> <span class="o">-</span> <span class="n">user_means</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">centered</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">reconstructed</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">]</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">[:</span><span class="n">k</span><span class="p">])</span> <span class="o">@</span> <span class="n">vt</span><span class="p">[:</span><span class="n">k</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">reconstructed</span> <span class="o">+</span> <span class="n">user_means</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+</code></pre></div>
+<p>Reconstructing with <span class="arithmatex">\(k=2\)</span> factors fills in every blank with a rating
+consistent with the user's genre:</p>
+<p><img alt="Two heatmaps of an 8-user by 6-song rating matrix: observed ratings with several blank cells on the left, and the SVD-reconstructed predicted ratings filling in every cell on the right" src="../images/svd-recommender.png" /></p>
+<p>For instance <code>u3</code> never rated <code>rock_c</code>, but since <code>u3</code> rated every other
+rock song 5, SVD predicts <code>rock_c</code> at 4.4 — high enough to surface as a
+recommendation — while <code>u3</code>'s predicted pop ratings stay low. The script
+also hides one <em>known</em> rating and checks the prediction against the true
+value as a quick sanity check of the whole approach.</p>
+<div class="admonition info">
+<p class="admonition-title">Why not just use <code>numpy.linalg.svd</code> on sparse ratings directly?</p>
+<p>Real rating matrices are far too sparse (and far too big) to fill in
+and factor with a dense SVD like this toy example does. Production
+systems instead learn the same <span class="arithmatex">\(U_k\)</span>, <span class="arithmatex">\(V_k\)</span> factors by gradient
+descent directly against the <em>observed</em> entries only (skipping
+missing ones entirely) — the technique popularized by the Netflix
+Prize and implemented by libraries like
+<a href="https://surpriselib.com/">Surprise</a>. <code>sklearn.decomposition.TruncatedSVD</code>
+is a useful middle ground for larger-but-still-dense matrices, since
+it avoids computing the singular vectors you're about to discard.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

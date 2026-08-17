@@ -1,0 +1,1041 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Notes and summaries from machine learning papers I study">
+      
+      
+      
+      
+        <link rel="prev" href="../example-attention-is-all-you-need/">
+      
+      
+        <link rel="next" href="../../concepts/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Multivariate Singular Spectrum Analysis (Page Matrix SVD) - ML Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#on-multivariate-singular-spectrum-analysis-agarwal-alomar-shah-2020" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="ML Notes" class="md-header__button md-logo" aria-label="ML Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ML Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Multivariate Singular Spectrum Analysis (Page Matrix SVD)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ML Notes" class="md-nav__button md-logo" aria-label="ML Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ML Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Papers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Papers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example-attention-is-all-you-need/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Example: Attention Is All You Need
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multivariate Singular Spectrum Analysis (Page Matrix SVD)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multivariate Singular Spectrum Analysis (Page Matrix SVD)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-idea-the-page-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key idea: the Page matrix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#denoising-hard-singular-value-thresholding-hsvt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Denoising: Hard Singular Value Thresholding (HSVT)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#forecasting-page-wise-linear-regression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forecasting: page-wise linear regression
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multivariate-extension-mssa-stack-dont-average" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multivariate extension (mSSA): stack, don't average
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-example-single-stock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked example: single stock
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-example-multiple-stocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked example: multiple stocks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions-things-to-dig-into" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open questions / things to dig into
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../concepts/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/singular-value-decomposition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Singular Value Decomposition (SVD)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/svd-denoised-autoregressive-forecasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SVD-Denoised Autoregressive Forecasting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a New Note
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-idea-the-page-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key idea: the Page matrix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#denoising-hard-singular-value-thresholding-hsvt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Denoising: Hard Singular Value Thresholding (HSVT)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#forecasting-page-wise-linear-regression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forecasting: page-wise linear regression
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multivariate-extension-mssa-stack-dont-average" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multivariate extension (mSSA): stack, don't average
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-example-single-stock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked example: single stock
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-example-multiple-stocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked example: multiple stocks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions-things-to-dig-into" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open questions / things to dig into
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="on-multivariate-singular-spectrum-analysis-agarwal-alomar-shah-2020">On Multivariate Singular Spectrum Analysis (Agarwal, Alomar &amp; Shah, 2020)<a class="headerlink" href="#on-multivariate-singular-spectrum-analysis-agarwal-alomar-shah-2020" title="Permanent link">&para;</a></h1>
+<div class="admonition info">
+<p class="admonition-title">Reference</p>
+<p>Agarwal, A., Alomar, A., Shah, D. <em>On Multivariate Singular Spectrum
+Analysis: Tensor and Matrix Variants</em>.
+<a href="https://arxiv.org/abs/2006.13448">arXiv:2006.13448</a> ·
+<a href="https://github.com/AbdullahO/mSSA">reference implementation (mSSA)</a></p>
+</div>
+<p>The paper covers a lot of ground (a tensor variant tSSA, variance
+estimation, a "Hankel calculus" expressiveness theory, finite-sample
+error bounds). This note only covers the piece that's directly useful in
+practice and reusable outside the paper's theory: <strong>building a Page
+matrix from a time series and using SVD on it for denoising and
+forecasting</strong> — the matrix-based mSSA algorithm in the paper's Section
+1.1.</p>
+<h2 id="problem">Problem<a class="headerlink" href="#problem" title="Permanent link">&para;</a></h2>
+<p>Classical Singular Spectrum Analysis (SSA) denoises and forecasts a
+single time series by embedding it into a matrix and using its low-rank
+structure. The standard embedding is a <strong>Hankel (trajectory) matrix</strong>:
+overlapping length-<span class="arithmatex">\(L\)</span> windows, shifted one step at a time, as columns.
+Overlapping windows share most of their entries with their neighbors,
+which makes the resulting matrix's entries highly dependent on each
+other — convenient for classical SSA's signal-extraction heuristics, but
+hard to analyze rigorously (matrix estimation theory generally wants
+independent-ish noise across entries).</p>
+<h2 id="key-idea-the-page-matrix">Key idea: the Page matrix<a class="headerlink" href="#key-idea-the-page-matrix" title="Permanent link">&para;</a></h2>
+<p>Swap the overlapping Hankel embedding for a <strong>Page matrix</strong>: chop the
+series into <em>non-overlapping</em> consecutive length-<span class="arithmatex">\(L\)</span> blocks and lay them
+out as columns.</p>
+<div class="arithmatex">\[
+\mathrm{P}(X, T, L) \in \mathbb{R}^{L \times T/L}, \qquad
+\mathrm{P}(X, T, L)_{i,j} = X\bigl(i + (j-1)L\bigr)
+\]</div>
+<p>for a series <span class="arithmatex">\(X(1), \dots, X(T)\)</span> (<span class="arithmatex">\(T\)</span> assumed a multiple of <span class="arithmatex">\(L\)</span> for
+simplicity). Column <span class="arithmatex">\(j\)</span> is just the <span class="arithmatex">\(j\)</span>-th consecutive chunk of <span class="arithmatex">\(L\)</span>
+observations — no overlap with column <span class="arithmatex">\(j{+}1\)</span>. That non-overlap is what
+lets the paper treat columns as close enough to independent samples from
+a shared low-rank column space, which is what its finite-sample
+guarantees are built on (see <a href="https://arxiv.org/abs/2006.13448">Appendix A of the paper</a>
+for the fuller Page-vs-Hankel discussion).</p>
+<div class="admonition note">
+<p class="admonition-title">Relation to SVD applied elsewhere</p>
+<p>Once you have a matrix, denoising it by keeping only its top singular
+directions is the same <strong><a href="../../concepts/singular-value-decomposition/#low-rank-approximation-eckartyoung">low-rank approximation</a></strong>
+idea used throughout these notes — the Page matrix is just a specific,
+forecasting-friendly way to turn a <em>single</em> time series into a matrix
+in the first place.</p>
+</div>
+<h2 id="denoising-hard-singular-value-thresholding-hsvt">Denoising: Hard Singular Value Thresholding (HSVT)<a class="headerlink" href="#denoising-hard-singular-value-thresholding-hsvt" title="Permanent link">&para;</a></h2>
+<p>Take the SVD <span class="arithmatex">\(\mathrm{P}(X,T,L) = \sum_\ell s_\ell u_\ell v_\ell^\top\)</span> and
+keep only the top <span class="arithmatex">\(k\)</span> terms:</p>
+<div class="arithmatex">\[
+\widehat{\mathrm{P}}(X,T,L;k) = \sum_{\ell=1}^{k} s_\ell u_\ell v_\ell^\top
+\]</div>
+<p>Reading the entries of <span class="arithmatex">\(\widehat{\mathrm{P}}\)</span> back out in the same
+row/column order used to build <span class="arithmatex">\(\mathrm{P}\)</span> gives a <strong>denoised version of
+the original series</strong> — the paper calls this the <em>de-noised and imputed
+estimate</em> <span class="arithmatex">\(\hat f(t)\)</span>, since the same operation fills in any missing
+entries (they're zero-filled before the SVD, same as <code>NaN</code> handling in
+any matrix-completion setup).</p>
+<p><span class="arithmatex">\(k\)</span> is chosen by cross-validation in the paper; a simpler practical stand-in
+used in the code below is picking the smallest <span class="arithmatex">\(k\)</span> whose singular values
+capture some fixed fraction (e.g. 90%) of the total squared singular
+value ("spectral energy").</p>
+<h2 id="forecasting-page-wise-linear-regression">Forecasting: page-wise linear regression<a class="headerlink" href="#forecasting-page-wise-linear-regression" title="Permanent link">&para;</a></h2>
+<p>Denoising alone only reconstructs values you already observed. To
+forecast, the paper fits a linear model that predicts the <strong>last row</strong> of
+a page from the <strong>denoised first <span class="arithmatex">\(L-1\)</span> rows of that same page</strong>:</p>
+<div class="arithmatex">\[
+\hat\beta = \operatorname*{arg\,min}_{\beta \in \mathbb{R}^{L-1}}
+\sum_{m=1}^{T/L} \bigl(y_m - \beta^\top x_m\bigr)^2, \qquad
+x_m = \hat f\bigl(L(m{-}1){+}1 \dots L(m{-}1){+}L{-}1\bigr), \quad
+y_m = X(Lm)
+\]</div>
+<p>with one important detail: <span class="arithmatex">\(x_m\)</span>'s denoised values are computed after
+<em>zeroing out the page's own last row first</em>, so the features for page <span class="arithmatex">\(m\)</span>
+never get to see (leak) the value they're trying to predict.</p>
+<p>Once <span class="arithmatex">\(\hat\beta\)</span> is fit, forecasting a new point just means: take the
+last <span class="arithmatex">\(L-1\)</span> known values, dot them with <span class="arithmatex">\(\hat\beta\)</span>. The paper's own
+formula covers one step past the observed data; turning that into a
+genuine multi-step-ahead forecast (rolling the prediction forward,
+treating each forecast as if it were observed to predict the next one) is
+a standard extension, not something the paper's finite-sample guarantees
+cover directly — worth keeping in mind when reading the forecasts below.</p>
+<h2 id="multivariate-extension-mssa-stack-dont-average">Multivariate extension (mSSA): stack, don't average<a class="headerlink" href="#multivariate-extension-mssa-stack-dont-average" title="Permanent link">&para;</a></h2>
+<p>With <span class="arithmatex">\(N\)</span> related series, mSSA builds each series' own Page matrix and
+concatenates them <strong>column-wise</strong> into one <span class="arithmatex">\(L \times (N \cdot T/L)\)</span>
+<em>stacked</em> Page matrix. HSVT and the same page-wise regression are then
+applied once, across <em>all</em> series' pages pooled together — one shared
+<span class="arithmatex">\(L\)</span>, one shared rank <span class="arithmatex">\(k\)</span>, one shared <span class="arithmatex">\(\hat\beta\)</span>. This is the whole
+value proposition of mSSA over running SSA separately on each series: if
+the series share latent structure (e.g. stocks in the same sector moving
+together), pooling their pages gives the SVD more (approximately
+independent) samples of that shared structure to average over, which the
+paper shows tightens the error bound from SSA's <span class="arithmatex">\(1/\sqrt{T}\)</span> to mSSA's
+<span class="arithmatex">\(1/\sqrt{\min(N,T)\,T}\)</span>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Scale matters when pooling</p>
+<p>Stacking raw values only makes sense if the series are on comparable
+scales. A $500 stock and a $30 stock pooled without normalizing would
+just have the shared regression fit mostly whichever series has the
+larger scale. The code below z-scores each series before pooling and
+un-scales the forecasts afterward.</p>
+</div>
+<h2 id="worked-example-single-stock">Worked example: single stock<a class="headerlink" href="#worked-example-single-stock" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/ahsank/MachineLearning/blob/master/code/svd_page_matrix_stock_forecast.py"><code>code/svd_page_matrix_stock_forecast.py</code></a>
+downloads a stock's closing prices with <code>yfinance</code>, builds its Page
+matrix with <span class="arithmatex">\(L = \sqrt{T}\)</span> (the paper's suggested window length for a
+single series), denoises it, fits the forecasting regression, and rolls
+the forecast forward:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit_forecast_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">page_matrix</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+    <span class="n">P_masked</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">P_masked</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># avoid leaking the target into its own features</span>
+    <span class="n">u_k</span><span class="p">,</span> <span class="n">s_k</span><span class="p">,</span> <span class="n">vt_k</span> <span class="o">=</span> <span class="n">hard_singular_value_threshold</span><span class="p">(</span><span class="n">P_masked</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">P_hat</span> <span class="o">=</span> <span class="n">u_k</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s_k</span><span class="p">)</span> <span class="o">@</span> <span class="n">vt_k</span>
+
+    <span class="n">features</span> <span class="o">=</span> <span class="n">P_hat</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">T</span>   <span class="c1"># denoised history within each page</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>           <span class="c1"># actual next-step value for each page</span>
+    <span class="n">beta</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">beta</span>
+</code></pre></div>
+<p><img alt="AAPL closing price with a rank-1 Page-matrix SVD denoising overlaid, a backtest forecast against the last 40 known trading days, and a genuine 20-day forecast beyond that" src="../images/mssa-single-stock.png" /></p>
+<p>The rank-1 denoised line has a visible "staircase" look — with a small
+<span class="arithmatex">\(k\)</span>, the Page matrix's reconstruction is close to one shared shape
+repeated per page, so each length-<span class="arithmatex">\(L\)</span> block collapses toward a roughly
+constant level rather than a smooth trend line.</p>
+<p>Passing <code>--backtest-days 40</code> holds out the last 40 trading days, refits
+the model on everything before that, and forecasts them so they can be
+checked against prices that already happened (the green line above) —
+the only way to tell whether the red genuine forecast past the end of the
+data is remotely trustworthy, since there's no ground truth to compare it
+against yet.</p>
+<h2 id="worked-example-multiple-stocks">Worked example: multiple stocks<a class="headerlink" href="#worked-example-multiple-stocks" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/ahsank/MachineLearning/blob/master/code/svd_page_matrix_multi_stock_forecast.py"><code>code/svd_page_matrix_multi_stock_forecast.py</code></a>
+downloads several tickers at once, aligns them to shared trading days,
+z-scores each series, and pools their Page matrices into one stacked
+matrix before fitting a single shared forecasting model:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit_forecast_model</span><span class="p">(</span><span class="n">prices</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">stacked</span> <span class="o">=</span> <span class="n">stacked_page_matrix</span><span class="p">(</span><span class="n">prices</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>  <span class="c1"># column-wise concat across N series</span>
+    <span class="n">stacked_masked</span> <span class="o">=</span> <span class="n">stacked</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">stacked_masked</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">u_k</span><span class="p">,</span> <span class="n">s_k</span><span class="p">,</span> <span class="n">vt_k</span> <span class="o">=</span> <span class="n">hard_singular_value_threshold</span><span class="p">(</span><span class="n">stacked_masked</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">stacked_hat</span> <span class="o">=</span> <span class="n">u_k</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s_k</span><span class="p">)</span> <span class="o">@</span> <span class="n">vt_k</span>
+
+    <span class="n">features</span> <span class="o">=</span> <span class="n">stacked_hat</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># pooled across every series' pages</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="n">stacked</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">beta</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">beta</span>
+</code></pre></div>
+<p><img alt="Three stacked subplots (AAPL, GOOG, MSFT) each showing observed price, SVD-denoised trend, a backtest forecast, and a shared-model forecast" src="../images/mssa-multi-stock.png" /></p>
+<p>All three stocks are denoised and forecast by the <em>same</em> <span class="arithmatex">\(\hat\beta\)</span> —
+only each stock's own recent prices differ as inputs. The same
+<code>--backtest-days</code> option is available here, and it makes the shared
+model's blind spot obvious: MSFT had a sharp run-up during the held-out
+window that none of the three stocks' recent history predicted, so the
+green backtest line for MSFT stays flat while the actual price jumps —
+a reminder that a model built on a couple of low-rank trend directions
+won't catch a genuine regime change, whether it's forecasting on its own
+or pooled with other stocks. See
+<a href="https://github.com/ahsank/MachineLearning/blob/master/code/README.md"><code>code/README.md</code></a>
+for how to run either script yourself.</p>
+<div class="admonition note">
+<p class="admonition-title">What this note skips</p>
+<p>The paper's Table 1 compares mSSA against SSA, LSTM, DeepAR, TRMF,
+Prophet, and VAR on several benchmark datasets — mSSA does well, but
+this note doesn't cover those comparisons, the tensor variant (tSSA),
+or the finite-sample proofs. It also doesn't reproduce the paper's
+reference <a href="https://github.com/AbdullahO/mSSA"><code>mSSA</code></a> implementation;
+the code linked above is a from-scratch, simplified rewrite of the
+Page-matrix technique against real stock data.</p>
+</div>
+<h2 id="open-questions-things-to-dig-into">Open questions / things to dig into<a class="headerlink" href="#open-questions-things-to-dig-into" title="Permanent link">&para;</a></h2>
+<ul>
+<li>How much does the choice of <span class="arithmatex">\(L\)</span> actually matter in practice for daily
+  stock data — is <span class="arithmatex">\(\sqrt{T}\)</span> noticeably better than, say, a 5-day
+  (trading week) or 21-day (trading month) window?</li>
+<li>The paper's tensor variant (tSSA) is supposed to out-perform mSSA when
+  <span class="arithmatex">\(N\)</span> is large relative to <span class="arithmatex">\(T\)</span> — worth a follow-up note once there's a
+  concrete use case with many series and a shorter history each.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
