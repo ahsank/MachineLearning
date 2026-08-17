@@ -51,11 +51,14 @@ folder — delete those files too if you don't want to keep them around.
   downloads one stock's price history (via `yfinance`, needs network
   access), denoises it with SVD on its "Page matrix", and forecasts
   future prices. `python svd_page_matrix_stock_forecast.py [TICKER]
-  --period 2y --horizon 20`. Accompanies
+  --period 2y --horizon 20`. Add `--backtest-days 40` to also hold out
+  the last 40 trading days, forecast them from the preceding history, and
+  plot predicted vs. actual for that window (with RMSE/MAPE printed).
+  Accompanies
   [Multivariate Singular Spectrum Analysis — single stock](../notes/papers/mssa-page-matrix-svd.md#worked-example-single-stock).
 - [`svd_page_matrix_multi_stock_forecast.py`](svd_page_matrix_multi_stock_forecast.py) —
   same idea across several stocks at once, pooled into one shared model
   via a stacked Page matrix (needs network access). `python
   svd_page_matrix_multi_stock_forecast.py AAPL MSFT GOOG --period 2y`.
-  Accompanies
+  Also supports `--backtest-days`. Accompanies
   [Multivariate Singular Spectrum Analysis — multiple stocks](../notes/papers/mssa-page-matrix-svd.md#worked-example-multiple-stocks).

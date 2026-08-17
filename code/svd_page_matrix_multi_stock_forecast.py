@@ -16,6 +16,7 @@ described in the paper (not the reference `mSSA` package).
 Usage:
     python svd_page_matrix_multi_stock_forecast.py [TICKERS...] [--period 2y] [--horizon 20]
     python svd_page_matrix_multi_stock_forecast.py AAPL MSFT GOOG --period 2y
+    python svd_page_matrix_multi_stock_forecast.py AAPL MSFT GOOG --backtest-days 40
 """
 
 from __future__ import annotations
@@ -126,12 +127,37 @@ def forecast_all(prices: np.ndarray, beta: np.ndarray, horizon: int) -> np.ndarr
     return predictions
 
 
-def plot_forecasts(dates, prices, denoised, forecast_dates, predictions, tickers, L, k, out_path):
+def backtest(prices: np.ndarray, backtest_days: int) -> tuple[np.ndarray, np.ndarray, int, int]:
+    """Hold out the last `backtest_days` rows, fit on the preceding
+    history only (normalized using only that history, to avoid leaking
+    the held-out period's scale into the model), and forecast that many
+    steps forward for every stock."""
+    train, actual = prices[:-backtest_days], prices[-backtest_days:]
+    train_norm, mean, std = normalize(train)
+    L = int(round(np.sqrt(train.shape[1] * train.shape[0])))
+    _, k = denoise_all(train_norm, L)
+    beta = fit_forecast_model(train_norm, L, k)
+    predictions = forecast_all(train_norm, beta, backtest_days) * std + mean
+    return predictions, actual, L, k
+
+
+def forecast_errors(predictions: np.ndarray, actual: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    rmse = np.sqrt(np.mean((predictions - actual) ** 2, axis=0))
+    mape = np.mean(np.abs((predictions - actual) / actual), axis=0) * 100
+    return rmse, mape
+
+
+def plot_forecasts(
+    dates, prices, denoised, forecast_dates, predictions, tickers, L, k, out_path,
+    backtest_dates=None, backtest_predictions=None,
+):
     fig, axes = plt.subplots(len(tickers), 1, figsize=(10, 3 * len(tickers)), sharex=True)
     axes = np.atleast_1d(axes)
     for i, (ax, ticker) in enumerate(zip(axes, tickers)):
         ax.plot(dates, prices[:, i], label="Observed close", color="tab:gray", linewidth=1)
         ax.plot(dates[-len(denoised):], denoised[:, i], label="Denoised", color="tab:blue")
+        if backtest_dates is not None:
+            ax.plot(backtest_dates, backtest_predictions[:, i], label="Backtest forecast", color="tab:green", linestyle="--", marker="o", markersize=3)
         ax.plot(forecast_dates, predictions[:, i], label="Forecast", color="tab:red", linestyle="--", marker="o", markersize=3)
         ax.axvline(dates[-1], color="lightgray", linewidth=0.8)
         ax.set_title(ticker)
@@ -149,6 +175,12 @@ def main() -> None:
     parser.add_argument("tickers", nargs="*", default=DEFAULT_TICKERS)
     parser.add_argument("--period", default="2y", help="yfinance history window, e.g. 1y, 2y, 5y")
     parser.add_argument("--horizon", type=int, default=20, help="trading days to forecast")
+    parser.add_argument(
+        "--backtest-days", type=int, default=0,
+        help="hold out this many trailing trading days, forecast them from the "
+             "preceding history, and plot predicted vs. actual for that window "
+             "(e.g. 40 for ~2 months); 0 disables",
+    )
     args = parser.parse_args()
 
     df = download_prices(args.tickers, args.period)
@@ -177,10 +209,24 @@ def main() -> None:
         row = " ".join(f"{predictions[h, i]:10.2f}" for i in range(len(tickers)))
         print(f"  t+{h+1:<4d}: {row}")
 
+    backtest_dates = backtest_predictions = None
+    if args.backtest_days > 0:
+        bt_predictions, bt_actual, bt_L, bt_k = backtest(prices, args.backtest_days)
+        rmse, mape = forecast_errors(bt_predictions, bt_actual)
+        print(
+            f"\nBacktest: held out the last {args.backtest_days} trading days "
+            f"(trained on the preceding {len(prices) - args.backtest_days}, L={bt_L}, k={bt_k})"
+        )
+        for i, ticker in enumerate(tickers):
+            print(f"  {ticker}: RMSE={rmse[i]:.2f}  MAPE={mape[i]:.2f}%")
+        backtest_dates = df.index[-args.backtest_days:]
+        backtest_predictions = bt_predictions
+
     forecast_dates = pd.bdate_range(df.index[-1], periods=args.horizon + 1)[1:]
     plot_forecasts(
         df.index, prices, denoised, forecast_dates, predictions,
         tickers, L, k, out_path="svd_page_matrix_multi_stock.png",
+        backtest_dates=backtest_dates, backtest_predictions=backtest_predictions,
     )
 
 

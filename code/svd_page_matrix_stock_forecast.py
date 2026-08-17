@@ -16,6 +16,7 @@ regression pipeline applied to real data.
 
 Usage:
     python svd_page_matrix_stock_forecast.py [TICKER] [--period 2y] [--horizon 20]
+    python svd_page_matrix_stock_forecast.py [TICKER] --backtest-days 40
 """
 
 from __future__ import annotations
@@ -105,10 +106,34 @@ def forecast(x: np.ndarray, beta: np.ndarray, horizon: int) -> np.ndarray:
     return np.array(predictions)
 
 
-def plot_forecast(dates, prices, denoised, forecast_dates, predictions, ticker, L, k, out_path):
+def backtest(x: np.ndarray, backtest_days: int) -> tuple[np.ndarray, np.ndarray, int, int]:
+    """Hold out the last `backtest_days` values, fit the model on the
+    preceding history only, and forecast that many steps forward -- so
+    the forecast can be checked against prices we already know actually
+    happened, instead of just projecting into the unknown future."""
+    train, actual = x[:-backtest_days], x[-backtest_days:]
+    L = int(round(np.sqrt(len(train))))
+    _, k = denoise_series(train, L)
+    beta = fit_forecast_model(train, L, k)
+    predictions = forecast(train, beta, backtest_days)
+    return predictions, actual, L, k
+
+
+def forecast_errors(predictions: np.ndarray, actual: np.ndarray) -> tuple[float, float]:
+    rmse = float(np.sqrt(np.mean((predictions - actual) ** 2)))
+    mape = float(np.mean(np.abs((predictions - actual) / actual)) * 100)
+    return rmse, mape
+
+
+def plot_forecast(
+    dates, prices, denoised, forecast_dates, predictions, ticker, L, k, out_path,
+    backtest_dates=None, backtest_predictions=None,
+):
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(dates, prices, label="Observed close", color="tab:gray", linewidth=1)
     ax.plot(dates[-len(denoised):], denoised, label=f"Denoised (rank k={k})", color="tab:blue")
+    if backtest_dates is not None:
+        ax.plot(backtest_dates, backtest_predictions, label="Backtest forecast", color="tab:green", linestyle="--", marker="o", markersize=3)
     ax.plot(forecast_dates, predictions, label="Forecast", color="tab:red", linestyle="--", marker="o", markersize=3)
     ax.axvline(dates[-1], color="lightgray", linewidth=0.8)
     ax.set_title(f"{ticker}: Page-matrix SVD denoising + forecast (L={L})")
@@ -125,6 +150,12 @@ def main() -> None:
     parser.add_argument("ticker", nargs="?", default="AAPL")
     parser.add_argument("--period", default="2y", help="yfinance history window, e.g. 1y, 2y, 5y")
     parser.add_argument("--horizon", type=int, default=20, help="trading days to forecast")
+    parser.add_argument(
+        "--backtest-days", type=int, default=0,
+        help="hold out this many trailing trading days, forecast them from the "
+             "preceding history, and plot predicted vs. actual for that window "
+             "(e.g. 40 for ~2 months); 0 disables",
+    )
     args = parser.parse_args()
 
     series = download_prices(args.ticker, args.period)
@@ -144,10 +175,23 @@ def main() -> None:
     for i, price in enumerate(predictions, start=1):
         print(f"  t+{i:<3d}: {price:.2f}")
 
+    backtest_dates = backtest_predictions = None
+    if args.backtest_days > 0:
+        bt_predictions, bt_actual, bt_L, bt_k = backtest(x, args.backtest_days)
+        rmse, mape = forecast_errors(bt_predictions, bt_actual)
+        print(
+            f"\nBacktest: held out the last {args.backtest_days} trading days "
+            f"(trained on the preceding {len(x) - args.backtest_days}, L={bt_L}, k={bt_k})"
+        )
+        print(f"  RMSE={rmse:.2f}  MAPE={mape:.2f}%")
+        backtest_dates = series.index[-args.backtest_days:]
+        backtest_predictions = bt_predictions
+
     forecast_dates = pd.bdate_range(series.index[-1], periods=args.horizon + 1)[1:]
     plot_forecast(
         series.index, x, denoised, forecast_dates, predictions,
         args.ticker, L, k, out_path=f"svd_page_matrix_{args.ticker.lower()}.png",
+        backtest_dates=backtest_dates, backtest_predictions=backtest_predictions,
     )
 
 

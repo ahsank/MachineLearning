@@ -141,12 +141,19 @@ def fit_forecast_model(x, L, k):
     return beta
 ```
 
-![AAPL closing price with a rank-1 Page-matrix SVD denoising overlaid, plus a 20-day forecast](images/mssa-single-stock.png)
+![AAPL closing price with a rank-1 Page-matrix SVD denoising overlaid, a backtest forecast against the last 40 known trading days, and a genuine 20-day forecast beyond that](images/mssa-single-stock.png)
 
 The rank-1 denoised line has a visible "staircase" look — with a small
 $k$, the Page matrix's reconstruction is close to one shared shape
 repeated per page, so each length-$L$ block collapses toward a roughly
 constant level rather than a smooth trend line.
+
+Passing `--backtest-days 40` holds out the last 40 trading days, refits
+the model on everything before that, and forecasts them so they can be
+checked against prices that already happened (the green line above) —
+the only way to tell whether the red genuine forecast past the end of the
+data is remotely trustworthy, since there's no ground truth to compare it
+against yet.
 
 ## Worked example: multiple stocks
 
@@ -169,10 +176,17 @@ def fit_forecast_model(prices, L, k):
     return beta
 ```
 
-![Three stacked subplots (AAPL, GOOG, MSFT) each showing observed price, SVD-denoised trend, and a shared-model forecast](images/mssa-multi-stock.png)
+![Three stacked subplots (AAPL, GOOG, MSFT) each showing observed price, SVD-denoised trend, a backtest forecast, and a shared-model forecast](images/mssa-multi-stock.png)
 
 All three stocks are denoised and forecast by the *same* $\hat\beta$ —
-only each stock's own recent prices differ as inputs. See
+only each stock's own recent prices differ as inputs. The same
+`--backtest-days` option is available here, and it makes the shared
+model's blind spot obvious: MSFT had a sharp run-up during the held-out
+window that none of the three stocks' recent history predicted, so the
+green backtest line for MSFT stays flat while the actual price jumps —
+a reminder that a model built on a couple of low-rank trend directions
+won't catch a genuine regime change, whether it's forecasting on its own
+or pooled with other stocks. See
 [`code/README.md`](https://github.com/ahsank/MachineLearning/blob/master/code/README.md)
 for how to run either script yourself.
 
